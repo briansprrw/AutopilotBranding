@@ -55,4 +55,7 @@
     <SupportHours>8am-5pm PST</SupportHours>
     <SupportURL>http://www.contoso.com</SupportURL>
   </OEMInfo>
+  <Taskbar>
+    <LeftAlign>true</LeftAlign>
+  </Taskbar>
 </Config>
