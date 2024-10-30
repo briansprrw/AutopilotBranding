@@ -184,4 +184,32 @@ reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff" 
 Log "Turning off Edge desktop icon"
 reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "CreateDesktopShortcutDefault" /t REG_DWORD /d 0 /f /reg:64 | Out-Host
 
+# STEP 16: Set Taskbar Alignment to Left if Configured
+if ($config.Config.Taskbar.LeftAlign -eq "true") {
+    Log "Setting taskbar alignment to the left."
+
+    # Set taskbar alignment for Default user (running as System)
+    try {
+        reg.exe load HKLM\TempUser "C:\Users\Default\NTUSER.DAT" | Out-Host
+        Set-ItemProperty -Path "HKLM:\TempUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarAl" -Value 0 -Force
+        reg.exe unload HKLM\TempUser | Out-Host
+        Log "Successfully set taskbar alignment to the left for Default user."
+    } catch {
+        Log "Failed to set taskbar alignment for Default user: $_"
+    }
+
+    # Set taskbar alignment for local user
+    try {
+        $userKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+        Set-ItemProperty -Path $userKey -Name "TaskbarAl" -Value 0 -Force
+        Log "Successfully set taskbar alignment to the left for local user."
+    } catch {
+        Log "Failed to set taskbar alignment for local user: $_"
+    }
+} else {
+    Log "Taskbar Left Align setting is not enabled in config, skipping taskbar alignment."
+}
+
+
+
 Stop-Transcript
